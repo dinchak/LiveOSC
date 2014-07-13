@@ -55,6 +55,7 @@ class LiveOSCCallbacks:
         self.callbackManager.add("/live/scene", self.sceneCB)
         self.callbackManager.add("/live/name/sceneblock", self.nameSceneBlockCB)
         self.callbackManager.add("/live/name/track", self.nameTrackCB)
+        self.callbackManager.add("/live/name/return", self.nameReturnCB)
         self.callbackManager.add("/live/name/trackblock", self.nameTrackBlockCB)
         self.callbackManager.add("/live/name/clip", self.nameClipCB)
         self.callbackManager.add("/live/name/clipblock", self.nameClipBlockCB)    
@@ -445,6 +446,35 @@ class LiveOSCCallbacks:
             trackNumber = msg[2]
             name = msg[3]
             LiveUtils.getTrack(trackNumber).name = name
+
+    def nameReturnCB(self, msg, source):
+        """Called when a /live/name/return message is received.
+
+        Messages:
+        /live/name/return                            Returns a a series of all the track names in the form /live/name/track (int track, string name)
+        /live/name/return    (int track)             Returns a single track's name in the form /live/name/track (int track, string name)
+        /live/name/return    (int track, string name)Sets track number track's name to name
+
+        """
+        #Requesting all track names
+        if len(msg) == 2 or (len(msg) == 3 and msg[2] == "query"):
+            trackNumber = 0
+            bundle = OSC.OSCBundle()
+            for track in LiveUtils.getSong().return_tracks:
+                bundle.append("/live/name/return", (trackNumber, str(track.name)))
+                trackNumber = trackNumber + 1
+            self.oscEndpoint.sendMessage(bundle)
+            return
+        #Requesting a single track name
+        if len(msg) == 3:
+            trackNumber = msg[2]
+            self.oscEndpoint.send("/live/name/return", (trackNumber, str(LiveUtils.getSong().return_tracks[trackNumber].name)))
+            return
+        #renaming a track
+        if len(msg) == 4:
+            trackNumber = msg[2]
+            name = msg[3]
+            LiveUtils.getSong().return_tracks[trackNumber].name = name
 
     def nameTrackBlockCB(self, msg, source):
         """Called when a /live/name/trackblock message is received.
