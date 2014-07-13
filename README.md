@@ -11,6 +11,6 @@ The author recently announced LiveOSC2 which will be used instead when it's read
 
 https://github.com/stufisher/LiveOSC2
 
-==Installation==
+# Installation
 
 Please see http://livecontrol.q3f.org/ableton-liveapi/liveosc/ for installation instructions.
